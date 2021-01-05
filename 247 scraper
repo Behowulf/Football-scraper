@@ -1,80 +1,96 @@
 import requests
+from urllib.request import Request, urlopen
 from requests import get
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+import re
 
-url = "https://www.imdb.com/search/title/?groups=top_1000&ref_=adv_prv"
-headers = {"Accept-Language": "en-US, en;q=0.5"}
-results = requests.get(url, headers=headers)
+url = "https://247sports.com/college/boston-college/Season/2021-Football/Commits/"
+hdr = {'User-Agent': 'Mozilla/5.0'}
+results = requests.get(url, headers=hdr)
+#page = urlopen(results)
+#response = urlopen(results, timeout=20).read()
 
 soup = BeautifulSoup(results.text, "html.parser")
 
+
 #initiate data storage
-titles = []
-years = []
-time = []
-imdb_ratings = []
-metascores = []
-votes = []
-us_gross = []
+names = []
+home_towns = []
+poss = []
+ht_wts = []
+ratings = []
+statuss = []
+#print(soup.prettify())
+list_items = soup.find_all('li', class_='ri-page__list-item')
 
-movie_div = soup.find_all('div', class_='lister-item mode-advanced')
-
-print(soup)
 #our loop through each container
-for container in movie_div:
+for container in list_items:
 
-        #name
-        name = container.h3.a.text
-        titles.append(name)
-        
-        #year
-        year = container.h3.find('span', class_='lister-item-year').text
-        years.append(year)
+	if "ri-page__list-item list-header" in str(container):
+		continue
+	player = container.find('a', class_='ri-page__name-link')
+	print(player.text)
+	metrics = container.find('div', class_='metrics').text.split('/')
+	height = metrics[0].strip()
+	weight = metrics[1].strip()
+	height = height.split('-')
+	height = int(height[0])*12 + int(height[1])
+	print(height)
+	print(weight)
+	school_town_state = container.find('span', class_='meta').text.split('(')
+	school = school_town_state[0].strip()
+	town_state = school_town_state[1].strip()
+	town_state.split(',')
+	town = town_state[0].strip()
+	state = town_state[1].strip()
+	pos = container.find('div', class_='position').text
+	print(pos.strip())    
+	print(home_town.strip())
+	print(school)
+	print(town_state)
+	print(town)
+	print(state)
+	break
 
-        # runtime
-        runtime = container.p.find('span', class_='runtime').text if container.p.find('span', class_='runtime').text else '-'
-        time.append(runtime)
+	# names.append(player)
+	
+	# #home_town
+	# home_town = container.find('span', class_='meta').text
+	# home_towns.append(home_town)
+	
+	# #pos
+	# pos = container.find('div', class_="position").text
+	# poss.append(pos)
 
-        #IMDb rating
-        imdb = float(container.strong.text)
-        imdb_ratings.append(imdb)
+	# #ht_wt
+	# ht_wt = container.li.find('a', class_='metrics').text
+	# ht_wts.append(ht_wt)
 
-        #metascore
-        m_score = container.find('span', class_='metascore').text if container.find('span', class_='metascore') else '-'
-        metascores.append(m_score)
+	# #ratings
+	# rating = container.li.find('span', class_='score').text
+	# ratings.append(rating)
 
-        #there are two NV containers, grab both of them as they hold both the votes and the grosses
-        nv = container.find_all('span', attrs={'name': 'nv'})
-        
-        #filter nv for votes
-        vote = nv[0].text
-        votes.append(vote)
-        
-        #filter nv for gross
-        grosses = nv[1].text if len(nv) > 1 else '-'
-        us_gross.append(grosses)
+	# #statuss
+	# status = container.li.find('p', class_='commit-date').text
+	# statuss.append(status)
 
-#pandas dataframe        
-movies = pd.DataFrame({
-'movie': titles,
-'year': years,
-'timeMin': time,
-'imdb': imdb_ratings,
-'metascore': metascores,
-'votes': votes,
-'us_grossMillions': us_gross,
-})
-
-#cleaning data 
-movies['year'] = movies['year'].str.extract('(\d+)').astype(int)
-movies['timeMin'] = movies['timeMin'].str.extract('(\d+)').astype(int)
-movies['metascore'] = movies['metascore'].astype(int)
-movies['votes'] = movies['votes'].str.replace(',', '').astype(int)
-movies['us_grossMillions'] = movies['us_grossMillions'].map(lambda x: x.lstrip('$').rstrip('M'))
-movies['us_grossMillions'] = pd.to_numeric(movies['us_grossMillions'], errors='coerce')
-
-#add dataframe to csv file named 'movies.csv'
-movies.to_csv('movies.csv')
-print(titles)
+	#there are two NV containers, grab both of them as they hold both the votes and the grosses
+	#nv = container.find_all('span', attrs={'name': 'nv'})
+	
+	#filter nv for votes
+	#vote = nv[0].text
+	#votes.append(vote)
+	
+	#filter nv for gross
+	#grosses = nv[1].text if len(nv) > 1 else '-'
+	#us_gross.append(grosses)
+#print(soup)
+#print(bc_div)
+#print(names)
+#print(home_towns)
+#print(poss)
+#print(ht_wts)
+#print(ratings)
+#print(statuss)
