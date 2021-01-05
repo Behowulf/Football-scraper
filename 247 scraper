@@ -28,27 +28,27 @@ bc_div = soup.find_all('div', class_='recruit')
 #our loop through each container
 for container in bc_div:
 
-        name
-        player = container.a.find(class_='recruit').value
+        #name
+        player = container.a.find(class_='recruit').text
         names.append(player)
         
-        home_town
+        #home_town
         home_town = container.find('span', class_='meta').text
         home_towns.append(home_town)
         
-        pos
+        #pos
         pos = container.find('div', class_="position").text
         poss.append(pos)
 
-        ht_wt
+        #ht_wt
         ht_wt = container.li.find('a', class_='metrics').text
         ht_wts.append(ht_wt)
 
-        ratings
+        #ratings
         rating = container.li.find('span', class_='score').text
         ratings.append(rating)
 
-        statuss
+        #statuss
         status = container.li.find('p', class_='commit-date').text
         statuss.append(status)
 
