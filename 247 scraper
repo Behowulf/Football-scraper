@@ -1,0 +1,72 @@
+import requests
+from urllib.request import Request, urlopen
+from requests import get
+from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
+
+url = "https://247sports.com/college/boston-college/Season/2021-Football/Commits/"
+hdr = {'User-Agent': 'Mozilla/5.0'}
+results = Request(url, headers=hdr)
+page = urlopen(results)
+response = urlopen(results, timeout=20).read()
+
+soup = BeautifulSoup(page, "html.parser")
+
+
+#initiate data storage
+names = []
+home_towns = []
+poss = []
+ht_wts = []
+ratings = []
+statuss = []
+
+
+bc_div = soup.find_all('div', class_='recruit')
+
+#our loop through each container
+for container in bc_div:
+
+        name
+        player = container.a.find(class_='recruit').value
+        names.append(player)
+        
+        home_town
+        home_town = container.find('span', class_='meta').text
+        home_towns.append(home_town)
+        
+        pos
+        pos = container.find('div', class_="position").text
+        poss.append(pos)
+
+        ht_wt
+        ht_wt = container.li.find('a', class_='metrics').text
+        ht_wts.append(ht_wt)
+
+        ratings
+        rating = container.li.find('span', class_='score').text
+        ratings.append(rating)
+
+        statuss
+        status = container.li.find('p', class_='commit-date').text
+        statuss.append(status)
+
+        #there are two NV containers, grab both of them as they hold both the votes and the grosses
+        #nv = container.find_all('span', attrs={'name': 'nv'})
+        
+        #filter nv for votes
+        #vote = nv[0].text
+        #votes.append(vote)
+        
+        #filter nv for gross
+        #grosses = nv[1].text if len(nv) > 1 else '-'
+        #us_gross.append(grosses)
+print(soup)
+print(bc_div)
+print(names)
+print(home_towns)
+print(poss)
+print(ht_wts)
+print(ratings)
+print(statuss)
