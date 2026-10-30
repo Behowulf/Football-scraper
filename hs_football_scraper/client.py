@@ -124,7 +124,7 @@ class Fetcher:
         log.debug("BROWSER GET %s", url)
         self._page.goto(url, wait_until="domcontentloaded", timeout=self.timeout * 1000)
         try:
-            self._page.wait_for_selector("a[href*='/player/']", timeout=10000)
+            self._page.wait_for_selector("a[href*='/player/' i]", timeout=10000)
         except Exception:
             pass
         return self._page.content()
