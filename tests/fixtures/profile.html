@@ -1,45 +1,70 @@
-<!-- Hand-written sample mirroring a 247Sports player profile (not real data). -->
+<!-- Hand-written sample mirroring a 247Sports player profile (Oct 2026); names/values are fake. -->
 <html><head>
-<script type="application/ld+json">{"@type":"Person","name":"Test Player","birthDate":"2009-01-02",
- "image":"https://s3media.247sports.com/a.jpg"}</script>
+<script type="application/ld+json">{"@context":"http://schema.org","@type":"Person","name":"Test Player",
+ "birthDate":"1/2/2009 12:00:00 AM","height":[{"@type":"QuantitativeValue","value":"6-3"}],
+ "affiliation":{"@type":"SportsTeam","name":"Example High School "},"image":"https://s3media.247sports.com/a.jpg"}</script>
+<script type="application/ld+json">[{"data":[{"type":"hudl","path":"https://www.hudl.com/video/3/1/abc"}]}]</script>
 </head><body>
-<section class="main-header">
+<div class="network-bar"><a class="twx" href="https://twitter.com/247Sports/"></a></div>
+<header class="profile-header">
+ <div class="upper-cards">
+  <div class="img-container"><div class="img-block"><img class="jsonly" src="https://s3media.247sports.com/a.jpg?width=100"></div></div>
   <h1 class="name">Test Player</h1>
+  <div class="institution-block"><ul class="institution-list hidden">
+    <li><a class="profile-card__institution-list-link" href="/player/test-player-46100001/high-school-300001">Example High School (HS)</a></li>
+    <li><a class="profile-card__institution-list-link" href="/player/test-player-46100001/high-school-300009">Old School (HS)</a></li>
+  </ul></div>
   <ul class="metrics-list">
     <li><span>Pos</span><span>QB</span></li>
     <li><span>Height</span><span>6-3</span></li>
     <li><span>Weight</span><span>210</span></li>
   </ul>
   <ul class="details">
-    <li><span>High School</span><span>Example High School</span></li>
+    <li><span>High School</span><span><a href="https://www.maxpreps.com/oh/springfield/example/">Example High School</a></span></li>
     <li><span>City</span><span>Springfield, OH</span></li>
     <li><span>Class</span><span>2027</span></li>
   </ul>
-  <a href="https://twitter.com/testplayer7">Twitter</a>
-  <div class="commit-banner"><img alt="Example U"> Committed 6/15/2026</div>
-</section>
-<section class="rankings">
-  <div class="rankings-section">
-    <h3>247Sports Composite&reg;</h3>
-    <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
-    <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
-    <span class="icon-starsolid yellow"></span>
-    <div class="rank-block">0.9987</div>
+  <div class="watch-highlights-block"><a class="watch-highlights-link" href="/player/test-player-46100001/videos/"><span>Watch Highlights</span></a></div>
+ </div>
+ <div class="lower-cards">
+  <section class="rankings">
+   <section class="rankings-section">
+    <h3 class="title">247Sports</h3>
+    <div class="ranking"><div class="stars-block">
+      <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
+      <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
+      <span class="icon-starsolid lightgrey"></span></div>
+     <div class="rank-block">96</div></div>
     <ul class="ranks-list">
-      <li><b>Natl.</b><strong>1</strong></li>
-      <li><b>QB</b><strong>1</strong></li>
-      <li><b>OH</b><strong>1</strong></li>
+      <li><b>Natl.</b><a href="#"><strong>4</strong></a></li>
+      <li><b>QB</b><a href="#"><strong>2</strong></a></li>
+      <li><b>OH</b><a href="#"><strong>1</strong></a></li>
     </ul>
-  </div>
-  <div class="rankings-section">
-    <h3>247Sports</h3>
-    <div class="rank-block">99</div>
+   </section>
+   <section class="rankings-section">
+    <h3 class="title">247Sports Composite&reg;</h3>
+    <div class="ranking"><div class="stars-block">
+      <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
+      <span class="icon-starsolid yellow"></span><span class="icon-starsolid yellow"></span>
+      <span class="icon-starsolid yellow"></span></div>
+     <div class="rank-block">0.9987</div></div>
     <ul class="ranks-list">
-      <li><b>Natl.</b><strong>3</strong></li>
-      <li><b>QB</b><strong>2</strong></li>
-      <li><b>OH</b><strong>1</strong></li>
+      <li><b>Natl.</b><a href="#"><strong>1</strong></a></li>
+      <li><b>QB</b><a href="#"><strong>1</strong></a></li>
+      <li><b>OH</b><a href="#"><strong>1</strong></a></li>
     </ul>
-  </div>
-</section>
-<a href="/player/test-player-46100001/recruitinterests/">All Interests</a>
+   </section>
+  </section>
+  <section class="crystal-ball"><h3>Crystal Ball® Predictions</h3><p>No Crystal Ball predictions at this time.</p></section>
+ </div>
+</header>
+<a class="commit-banner" href="/college/example-u/season/2027-football/commits/">
+  <ul class="commit-banner-list"><li><img alt="Example U" title="Example U"></li>
+  <li><span>Example U Eagles</span><div><span>Hard Commit</span><span>- 6/15/2026</span></div></li></ul>
+</a>
+<a class="college-comp__roster-outlook-link" href="https://247sports.com/recruitment/test-player-100001/recruitinterests/">5 QB</a>
+<section class="timeline"><div class="timeline-body"><h4>2026</h4>
+  <div class="event"><div class="text-container"><h3>Jun 15, 2026: Commitment</h3><h4>Test Player commits to Example U</h4></div></div>
+  <div class="event"><div class="text-container"><h3>Jun 1, 2026: O. Visit</h3><h4>Test Player officially visits Example U</h4></div></div>
+</div></section>
 </body></html>

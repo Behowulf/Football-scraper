@@ -1,12 +1,12 @@
-<!-- Hand-written sample mirroring 247Sports composite rankings markup (not real data). -->
+<!-- Hand-written sample mirroring 247Sports composite rankings markup (Oct 2026); names/values are fake. -->
 <html><body>
 <ul class="rankings-page__list">
   <li class="rankings-page__list-item">
     <div class="wrapper">
-      <div class="rank-column"><div class="primary">1</div></div>
+      <div class="rank-column"><div class="primary">1</div><div class="other">4</div></div>
+      <div class="circle-image-block"><img class="jsonly" alt="Test Player" src="https://s3media.247sports.com/a.jpg"></div>
       <div class="recruit">
-        <img class="jsonly" data-src="https://s3media.247sports.com/a.jpg" alt="Test Player">
-        <a class="rankings-page__name-link" href="/player/test-player-46100001/">Test Player</a>
+        <a class="rankings-page__name-link" href="/player/test-player-46100001/high-school-300001/">Test Player</a>
         <span class="meta"> Example High School (Springfield, OH) </span>
       </div>
       <div class="position">QB</div>
@@ -18,18 +18,24 @@
           <span class="icon-starsolid yellow"></span>
           <span class="score">0.9987</span>
         </div>
+        <div class="rankings-page__comp-strength nimda"><span class="yellow"></span><span class="lightgrey"></span></div>
         <div class="rank">
           <a class="natrank" href="#">1</a><a class="posrank" href="#">1</a><a class="sttrank" href="#">1</a>
         </div>
       </div>
-      <div class="status"><a href="/college/example-u/"><img title="Example U" alt="Example U" src="x.png"></a></div>
+      <div class="status">
+        <a class="img-link" href="https://247sports.com/college/example-u/season/2027-football/commits/">
+          <img alt="Example U" class="jsonly" data-src="https://s3media.247sports.com/eu.png"
+               src="https://s3media.247sports.com/Content/Img/1x1.gif" title="Example U"></a>
+        <a aria-label="Expand" class="icon-caret-down expand-anchor" href="/Recruitment/test-player-100001?view=Complex"></a>
+      </div>
     </div>
   </li>
   <li class="rankings-page__list-item">
     <div class="wrapper">
-      <div class="rank-column"><div class="primary">2</div></div>
+      <div class="rank-column"><div class="primary">2</div><div class="other">2</div></div>
       <div class="recruit">
-        <a class="rankings-page__name-link" href="https://247sports.com/Player/Second-Guy-46100002/">Second Guy</a>
+        <a class="rankings-page__name-link" href="/player/second-guy-46100002/high-school-300002/">Second Guy</a>
         <span class="meta">Other Prep (Dallas, TX)</span>
       </div>
       <div class="position">DE</div>
@@ -43,9 +49,13 @@
         </div>
         <div class="rank"><a class="natrank">2</a><a class="posrank">1</a><a class="sttrank">1</a></div>
       </div>
-      <div class="status"><div class="crystal-ball">Predictions</div></div>
+      <div class="status">
+        <a aria-label="Expand" class="icon-caret-down expand-anchor" href="/Recruitment/second-guy-100002?view=Complex"></a>
+      </div>
     </div>
   </li>
+  <li class="rankings-page__list-item rankings-page__showmore showmore_blk">
+    <a data-js="showmore" href="https://247sports.com/season/2027-football/compositerecruitrankings/?ViewPath=~%2FViews%2FSkyNet%2FPlayerSportRanking%2F_SimpleSetForSeason.ascx&amp;InstitutionGroup=HighSchool&amp;Page=2">Load More</a>
+  </li>
 </ul>
-<a class="rankings-page__showmore" href="?InstitutionGroup=HighSchool&Page=2">Load More</a>
 </body></html>

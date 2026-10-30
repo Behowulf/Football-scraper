@@ -31,6 +31,7 @@ def export(db_path: str | Path, out_dir: str | Path) -> list[Path]:
         "prospects": pd.read_sql_query(FLAT_QUERY, conn),
         "rankings": pd.read_sql_query("SELECT * FROM rankings ORDER BY player_id, source", conn),
         "interests": pd.read_sql_query("SELECT * FROM interests ORDER BY player_id, school", conn),
+        "timeline": pd.read_sql_query("SELECT * FROM timeline ORDER BY player_id, event_date DESC", conn),
     }
     conn.close()
 
@@ -49,12 +50,13 @@ def export(db_path: str | Path, out_dir: str | Path) -> list[Path]:
     # Nested JSON: one object per prospect with their rankings and interests inline.
     prospects = frames["prospects"].to_dict("records")
     by_pid = lambda df: {pid: g.drop(columns="player_id").to_dict("records") for pid, g in df.groupby("player_id")}
-    rankings, interests = by_pid(frames["rankings"]), by_pid(frames["interests"])
+    rankings, interests, timeline = (by_pid(frames[k]) for k in ("rankings", "interests", "timeline"))
     for p in prospects:
         extra = p.pop("extra_json", None)
         p["extra"] = json.loads(extra) if isinstance(extra, str) else {}
         p["rankings"] = rankings.get(p["player_id"], [])
         p["interests"] = interests.get(p["player_id"], [])
+        p["timeline"] = timeline.get(p["player_id"], [])
     path = out / "prospects.json"
     path.write_text(json.dumps(prospects, indent=2, default=str, ensure_ascii=False), encoding="utf-8")
     written.append(path)

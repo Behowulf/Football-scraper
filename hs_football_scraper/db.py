@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS players (
     twitter             TEXT,
     image_url           TEXT,
     profile_url         TEXT,
+    interests_url       TEXT,
     composite_rank      INTEGER,
+    rank_247            INTEGER,  -- 247Sports' own national rank (second number in the list)
     stars               INTEGER,
     rating              REAL,
     national_rank       INTEGER,
@@ -63,9 +65,19 @@ CREATE TABLE IF NOT EXISTS interests (
     offered      INTEGER,
     status_date  TEXT,
     visit        TEXT,
+    recruited_by TEXT,
+    roster_outlook TEXT,
     raw_text     TEXT,
     scraped_at   TEXT,
     PRIMARY KEY (player_id, school)
+);
+
+-- Visits, offers, commitments etc. from the profile timeline.
+CREATE TABLE IF NOT EXISTS timeline (
+    player_id    INTEGER NOT NULL REFERENCES players(player_id),
+    event_date   TEXT,
+    event_type   TEXT,
+    description  TEXT
 );
 
 CREATE TABLE IF NOT EXISTS scrape_runs (
@@ -86,7 +98,8 @@ CREATE INDEX IF NOT EXISTS idx_players_commit ON players(commit_school);
 
 PLAYER_COLUMNS = (
     "name", "class_year", "position", "height", "height_in", "weight", "high_school", "city", "state",
-    "hometown", "birth_date", "twitter", "image_url", "profile_url", "composite_rank", "stars", "rating",
+    "hometown", "birth_date", "twitter", "image_url", "profile_url", "interests_url", "composite_rank",
+    "rank_247", "stars", "rating",
     "national_rank", "position_rank", "state_rank", "commit_school", "commit_status", "commit_date",
 )
 
@@ -108,9 +121,12 @@ class Database:
 
     # -- writes ---------------------------------------------------------
     def upsert_player(self, player: dict, source: str = "list", extra: dict | None = None) -> None:
-        """Insert or update a player. Missing (None) values never overwrite stored ones."""
+        """Insert or update a player. Missing (None) values never overwrite stored ones, except that the
+        rankings list is authoritative for commitments, so a decommitment clears the old school."""
         pid = player["player_id"]
         values = {c: player.get(c) for c in PLAYER_COLUMNS if player.get(c) is not None}
+        if source == "list" and "commit_school" in player:
+            values["commit_school"] = player["commit_school"]
         stamp = "list_scraped_at" if source == "list" else "profile_scraped_at"
         values[stamp] = now()
         if extra:
@@ -133,9 +149,13 @@ class Database:
                                      position_rank, state_rank, scraped_at)
                VALUES (?,?,?,?,?,?,?,?,?,?)
                ON CONFLICT(player_id, source) DO UPDATE SET
-                 class_year=excluded.class_year, stars=excluded.stars, rating=excluded.rating,
-                 national_rank=excluded.national_rank, position=excluded.position,
-                 position_rank=excluded.position_rank, state_rank=excluded.state_rank,
+                 class_year=coalesce(excluded.class_year, class_year),
+                 stars=coalesce(excluded.stars, stars),
+                 rating=coalesce(excluded.rating, rating),
+                 national_rank=coalesce(excluded.national_rank, national_rank),
+                 position=coalesce(excluded.position, position),
+                 position_rank=coalesce(excluded.position_rank, position_rank),
+                 state_rank=coalesce(excluded.state_rank, state_rank),
                  scraped_at=excluded.scraped_at""",
             (player_id, class_year, r["source"], r.get("stars"), r.get("rating"), r.get("national_rank"),
              r.get("position"), r.get("position_rank"), r.get("state_rank"), now()),
@@ -147,14 +167,23 @@ class Database:
         for i in interests:
             self.conn.execute(
                 """INSERT OR REPLACE INTO interests
-                   (player_id, school, school_url, status, offered, status_date, visit, raw_text, scraped_at)
-                   VALUES (?,?,?,?,?,?,?,?,?)""",
+                   (player_id, school, school_url, status, offered, status_date, visit, recruited_by,
+                    roster_outlook, raw_text, scraped_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                 (player_id, i["school"], i.get("school_url"), i.get("status"),
                  None if i.get("offered") is None else int(i["offered"]),
-                 i.get("status_date"), i.get("visit"), i.get("raw_text"), stamp),
+                 i.get("status_date"), i.get("visit"), i.get("recruited_by"), i.get("roster_outlook"),
+                 i.get("raw_text"), stamp),
             )
         offers = sum(1 for i in interests if i.get("offered"))
         self.conn.execute("UPDATE players SET offer_count=? WHERE player_id=?", (offers, player_id))
+
+    def replace_timeline(self, player_id: int, events: list[dict]) -> None:
+        self.conn.execute("DELETE FROM timeline WHERE player_id=?", (player_id,))
+        self.conn.executemany(
+            "INSERT INTO timeline (player_id, event_date, event_type, description) VALUES (?,?,?,?)",
+            [(player_id, e.get("event_date"), e.get("event_type"), e.get("description")) for e in events],
+        )
 
     def start_run(self, class_year: int, url: str) -> int:
         cur = self.conn.execute(
@@ -174,7 +203,7 @@ class Database:
 
     # -- reads ----------------------------------------------------------
     def players_needing_profiles(self, class_year: int, refresh: bool = False) -> list[sqlite3.Row]:
-        sql = "SELECT player_id, profile_url, name FROM players WHERE class_year=? AND profile_url IS NOT NULL"
+        sql = "SELECT player_id, profile_url, interests_url, name FROM players WHERE class_year=? AND profile_url IS NOT NULL"
         if not refresh:
             sql += " AND profile_scraped_at IS NULL"
         return self.conn.execute(sql + " ORDER BY composite_rank", (class_year,)).fetchall()

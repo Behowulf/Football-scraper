@@ -3,5 +3,4 @@ beautifulsoup4>=4.12
 lxml>=4.9
 pandas>=2.0
 openpyxl>=3.1
-# Optional, only for --browser:
-# playwright>=1.40
+playwright>=1.40

@@ -27,7 +27,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--refresh", action="store_true", help="re-scrape profiles already in the database")
     ap.add_argument("--delay", type=float, default=1.5, help="seconds between requests (default: 1.5)")
     ap.add_argument("--cache", default="data/cache", help="cache profile pages here ('' to disable)")
-    ap.add_argument("--browser", action="store_true", help="fetch with headless Chromium (needs playwright)")
+    ap.add_argument("--no-browser", action="store_true",
+                    help="use plain HTTP requests instead of headless Chromium (247Sports currently refuses these)")
     ap.add_argument("--export-only", action="store_true", help="just re-export the existing database")
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args(argv)
@@ -38,7 +39,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.export_only:
         db = Database(args.db)
-        fetcher = Fetcher(delay=args.delay, cache_dir=args.cache or None, use_browser=args.browser)
+        fetcher = Fetcher(delay=args.delay, cache_dir=args.cache or None, use_browser=not args.no_browser)
         run = db.start_run(args.year, rankings_url(args.year))
         count = errors = 0
         try:

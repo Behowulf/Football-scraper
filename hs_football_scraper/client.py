@@ -1,14 +1,16 @@
 """HTTP layer: polite, retrying fetcher with an optional on-disk cache.
 
-247Sports sometimes serves bot-challenge pages to plain HTTP clients. If that
-happens, pass ``use_browser=True`` to fetch pages through headless Chromium
-(requires ``pip install playwright && playwright install chromium``).
+247Sports answers plain HTTP clients with "406 Not Acceptable", so by default
+pages are loaded in headless Chromium via Playwright
+(``pip install playwright && playwright install chromium``). Set the
+``CHROMIUM_PATH`` environment variable to use an already-installed Chromium.
 """
 
 from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import random
 import time
 from pathlib import Path
@@ -40,7 +42,7 @@ class Fetcher:
         self,
         delay: float = 1.5,
         cache_dir: str | Path | None = None,
-        use_browser: bool = False,
+        use_browser: bool = True,
         timeout: int = 30,
     ):
         self.delay = delay
@@ -107,8 +109,8 @@ class Fetcher:
             raise FetchError(f"{url}: 404 Not Found")
         if resp.status_code >= 400:
             raise FetchError(
-                f"{url}: HTTP {resp.status_code}. If this persists, the site may be "
-                "blocking scripted requests; try --browser."
+                f"{url}: HTTP {resp.status_code}. 247Sports refuses plain HTTP requests; "
+                "run without --no-browser."
             )
         return resp.text
 
@@ -117,14 +119,19 @@ class Fetcher:
             try:
                 from playwright.sync_api import sync_playwright
             except ImportError as exc:
-                raise FetchError("--browser requires: pip install playwright") from exc
+                raise FetchError(
+                "Playwright is not installed. Run: pip install playwright && playwright install chromium"
+            ) from exc
             self._pw = sync_playwright().start()
-            self._browser = self._pw.chromium.launch(headless=True)
+            self._browser = self._pw.chromium.launch(
+                headless=True, executable_path=os.environ.get("CHROMIUM_PATH") or None
+            )
             self._page = self._browser.new_page(user_agent=DEFAULT_HEADERS["User-Agent"])
         log.debug("BROWSER GET %s", url)
-        self._page.goto(url, wait_until="domcontentloaded", timeout=self.timeout * 1000)
         try:
-            self._page.wait_for_selector("a[href*='/player/' i]", timeout=10000)
-        except Exception:
-            pass
+            resp = self._page.goto(url, wait_until="domcontentloaded", timeout=self.timeout * 1000)
+        except Exception as exc:
+            raise FetchError(f"{url}: {exc}") from exc
+        if resp is not None and resp.status >= 400:
+            raise FetchError(f"{url}: HTTP {resp.status}")
         return self._page.content()
